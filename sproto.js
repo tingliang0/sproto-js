@@ -27,6 +27,28 @@ var ENCODE_BUFFERSIZE = 2050;
 var ENCODE_MAXSIZE = 0x1000000;
 var ENCODE_DEEPLEVEL = 64;
 
+//js中只long只能表示到2^52-1, 0xFFFFFFFFFFFFF表示
+function expand64(v){
+    var value = v;
+    if ((value & 0x80000000) != 0){
+        value = 0x0000000000000 + (value & 0xFFFFFFFF);
+    }
+    return value;
+}
+
+function hi_low_uint64(low, hi){
+    var value = (hi & 0xFFFFFFFF) * 0x100000000 + low;
+    return value;
+}
+
+function int64_lshift(num, offset){
+    return num * Math.pow(2, offset);
+}
+
+function uint64_rshift(num, offset){
+    return Math.floor(num / Math.pow(2, offset));
+}
+
 function array_concat(a1, a2){
     var b = new Array();
     for (var i=0; i<a1.sz; i++){
@@ -113,7 +135,7 @@ function toword(stream){
 };
 
 function todword(stream){
-    return (stream[0] & 0xff) | (stream[1] & 0xff) << 8 | (stream[2] & 0xff) << 16 | (stream[3] & 0xff) << 24;
+    return ((stream[0] & 0xff) | (stream[1] & 0xff) << 8 | (stream[2] & 0xff) << 16 | (stream[3] & 0xff) << 24) >>> 0;
 };
 
 function count_array(stream){
@@ -547,27 +569,27 @@ function fill_size(data, data_idx, sz){
 }
 
 function encode_integer(v, data, data_idx, size){
-    if (size < SIZEOF_LENGTH + sizeof(v))
-		return -1;
+    //if (size < SIZEOF_LENGTH + sizeof(v))
+	//	return -1;
 	data[data_idx+4] = v & 0xff;
 	data[data_idx+5] = (v >> 8) & 0xff;
 	data[data_idx+6] = (v >> 16) & 0xff;
 	data[data_idx+7] = (v >> 24) & 0xff;
-	return fill_size(data, data_idx, sizeof(v));
+	return fill_size(data, data_idx, 4);
 }
 
 function encode_uint64(v, data, data_idx, size){
-    if (size < SIZEOF_LENGTH + sizeof(v))
-		return -1;
+    //if (size < SIZEOF_LENGTH + sizeof(v))
+	//	return -1;
 	data[data_idx+4] = v & 0xff;
-	data[data_idx+5] = (v >> 8) & 0xff;
-	data[data_idx+6] = (v >> 16) & 0xff;
-	data[data_idx+7] = (v >> 24) & 0xff;
-	data[data_idx+8] = (v >> 32) & 0xff;
-	data[data_idx+9] = (v >> 40) & 0xff;
-	data[data_idx+10] = (v >> 48) & 0xff;
-	data[data_idx+11] = (v >> 56) & 0xff;
-	return fill_size(data, data_idx, sizeof(v));
+	data[data_idx+5] = uint64_rshift(v, 8) & 0xff;
+	data[data_idx+6] = uint64_rshift(v, 16) & 0xff;
+	data[data_idx+7] = uint64_rshift(v, 24) & 0xff;
+	data[data_idx+8] = uint64_rshift(v, 32) & 0xff;
+	data[data_idx+9] = uint64_rshift(v, 40) & 0xff;
+	data[data_idx+10] = uint64_rshift(v, 48) & 0xff;
+	data[data_idx+11] = uint64_rshift(v, 56) & 0xff;
+	return fill_size(data, data_idx, 8);
 }
 
 /*
@@ -795,20 +817,6 @@ function decode_array_object(cb, args, stream, sz){
     return 0;
 }
 
-
-//js中只long只能表示到2^52-1, 0xFFFFFFFFFFFFF表示
-function expand64(v){
-    var value = v;
-    if ((value & 0x80000000) != 0){
-        value = 0x0000000000000 + (value & 0xFFFFFFFF);
-    }
-    return value;
-}
-
-function hi_low_uint64(low, hi){
-    var value = (hi & 0xFFFFFFFF) * 0x100000000 + low;
-    return value;
-}
 
 function decode_array(cb, args, stream){
     var sz = todword(stream);
@@ -1134,10 +1142,10 @@ var Sproto = {
                                 value = (args.value + 1) * 2;
                                 sz = 2;
                             } else {
-                                sz = encode_integer(args.value, buffer, data_idx, size);
+                                sz = encode_integer(args.value, buffer, data_idx, sz);
                             }
                         } else if(sz == 8){
-                            sz = encode_uint64(args.value, buffer, data_idx, size);
+                            sz = encode_uint64(args.value, buffer, data_idx, sz);
                         } else {
                             return -1;
                         }
@@ -1237,7 +1245,7 @@ var Sproto = {
                 } else {
                     v = target;
                 }
-                vh = v >> 31;
+                vh = uint64_rshift(v, 31);
                 if (vh == 0 || vh == -1){
                     args.value = v & 0xFFFFFFFF;
                     return 4;
@@ -1353,7 +1361,7 @@ var Sproto = {
                                 return -1;
                             } else {
                                 var low = todword(currentdata.slice(SIZEOF_LENGTH));
-                                var hi = toword(currentdata + SIZEOF_LENGTH + 4);
+                                var hi = todword(currentdata.slice(SIZEOF_LENGTH + 4));
                                 var v = hi_low_uint64(low, hi);
                                 args.value = v;
                                 args.length = 8;
@@ -1546,15 +1554,15 @@ var Sproto = {
             return Sproto.decode(type, obuf);
         }
 
-        sproto.host = function(){
+        sp.host = function(){
 
         }
 
-        sproto.attach = function(){
+        sp.attach = function(){
 
         }
 
-        sproto.dispatch = function(buf, req_cb, rsp_cb) {
+        sp.dispatch = function(buf, req_cb, rsp_cb) {
 
         }
 
