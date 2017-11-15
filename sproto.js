@@ -916,7 +916,9 @@ var Sproto = (function(){
                 write_ff(ff_srcstart, ff_srcstart_idx, ff_desstart, ff_desstart_idx, srcsz-ff_srcstart_idx);
             }
             if (buffer.length > size){
-                buffer = buffer.slice(0, size);
+                for (var i=size; i<buffer.length; i++){
+                    buffer[i] = 0;
+                }
             }
         }
         return size;
