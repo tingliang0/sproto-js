@@ -1,7 +1,39 @@
 var fs = require("fs");
 var sproto = require("./sproto");
-var filename = "./protocol_test.spb";
+var utils = require("./utils");
 
+// var filename = "./test.spb";
+// var buffer = fs.readFileSync(filename);
+// if (buffer == null){
+// 	console.log("read File err1");
+// }
+// console.log(sproto);
+
+// var sp = sproto.createNew(buffer);
+// console.log(sp);
+
+// var req = {
+// 	name : "abdef",
+// 	isvip : true,
+// 	boolarr : [ true, false, true, true, false, false ],
+// }
+
+// var binary = sp.encode("test.MyInfo", req);
+// console.log(binary);
+
+
+// var pack_binary = sp.pack(binary);
+// console.log(pack_binary);
+
+// var unpack_binary = sp.unpack(pack_binary);
+// console.log(unpack_binary);
+
+// var data = sp.decode("test.MyInfo", unpack_binary);
+// console.log(data);
+
+
+
+var filename = "./protocol.spb";
 var buffer = fs.readFileSync(filename);
 if (buffer == null){
 	console.log("read File err1");
@@ -11,42 +43,34 @@ console.log(sproto);
 var sp = sproto.createNew(buffer);
 console.log(sp);
 
-var req = {
-	protoid : 4355,
-	roomproxy : "brsgong",
-    // session : 5,
-    // int_ids : [1, 2, 3, 4, 5],
-    // string_ids : ["aaa", "bbb", "ccc"],
-    // int_struct : {
-    //     id : 1003,
-    //     socres : [1, 1, 1],
-    // },
-    // repeat_structs : [
-    //     {id : 1003, socres : [1, 1, 1], },
-    //     {id : 1004, socres : [2, 2, 2], },
-    //     {id : 1005, socres : [3, 3, 3], },
-    //     {id : 1006, socres : [4, 4, 4], },
-    // ],
-    // map_structs : [
-    //     {id : 1, socres : [1, 1, 1], },
-    //     {id : 2, socres : [2, 2, 2], },
-    //     {id : 3, socres : [3, 3, 3], },
-    //     {id : 4, socres : [4, 4, 4], },
-    // ],
-    float_id : 100.03,
-    //image : "\0x01\0x03\0x04",
-}
+// var bin = [93, 2, 8, 2, 4, 2, 17, 3, 32, 255, 3, 48, 55, 49, 52, 57, 75, 85, 122, 48, 78, 107, 56, 55, 104, 49, 119, 111, 98, 86, 122, 48, 109, 101, 65, 85, 122, 48, 52, 57, 75, 85, 112, 112];
 
-var binary = sp.encode("Package", req);
-console.log(binary);
-// var data = sp.decode("Package", binary);
+// var un_bin = sp.unpack(bin);
+// console.log(un_bin);
+
+// var header = sp.decode("Package", un_bin);
+// console.log(header);
+
+// var used_sz = sp.objlen("Package", un_bin);
+// var left_sz = un_bin.length - used_sz;
+// var left_bin = un_bin.slice(used_sz, un_bin.length);
+// var data = sp.decode("auth.WeiXinReq", left_bin);
 // console.log(data);
 
-var pack_binary = sp.pack(binary);
-console.log(pack_binary);
+var header = {
+	session : 1,
+	protoid : 257,
+};
 
-var unpack_binary = sp.unpack(pack_binary);
-console.log(unpack_binary);
+var req = {
+	code : "07149KUz0Nk87h1wobVz0meAUz049KUp",
+};
 
-var data = sp.decode("Package", unpack_binary);
-console.log(data);
+var header_buffer = sp.encode("Package", header);
+var data_buffer = sp.encode("auth.WeiXinReq", req);
+console.log(header_buffer);
+console.log(data_buffer);
+var concat_buffer = utils.arrayconcat(header_buffer, data_buffer);
+var pack_buffer = sp.pack(concat_buffer);
+console.log(pack_buffer);
+

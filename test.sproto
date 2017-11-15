@@ -1,4 +1,4 @@
-.Test{
+.test {
 	.PropInfo{
 		propid 0 : integer #
 		propname 1 : string
@@ -11,5 +11,6 @@
 		propids 4 : *integer
 		propinfos 5 : *PropInfo(propid)
 		pic_data 6 : binary
+		boolarr 7 : *boolean
 	}
 }

@@ -679,7 +679,7 @@ var Sproto = (function(){
                 if (sz < 1){
                     return -1;
                 }
-                buffer[buffer_idx] = v ? 1 : 0;
+                buffer[buffer_idx] = (args.value == 1) ? 1 : 0;
                 buffer_idx++;
                 ++args.index;
             }
@@ -914,6 +914,9 @@ var Sproto = (function(){
                 write_ff(ff_srcstart, ff_srcstart_idx, ff_desstart, ff_desstart_idx, 8);
             } else if(ff_n > 1){
                 write_ff(ff_srcstart, ff_srcstart_idx, ff_desstart, ff_desstart_idx, srcsz-ff_srcstart_idx);
+            }
+            if (buffer.length > size){
+                buffer = buffer.slice(0, size);
             }
         }
         return size;
@@ -1178,7 +1181,12 @@ var Sproto = (function(){
                 }
             }
             case SPROTO_TBOOLEAN:{
-                args.value = target;
+                if (target == true){
+                    args.value = 1;
+                } else if(target == false) {
+                    args.value = 0;
+                }
+                //args.value = target;
                 return 4;
             }
             case SPROTO_TSTRING:{
@@ -1346,7 +1354,11 @@ var Sproto = (function(){
                 break;
             }
             case SPROTO_TBOOLEAN:{
-                var v = args.value;
+                if (args.value == 1){
+                    value = true;
+                } else if(args.value == 0){
+                    value = false;
+                }
                 break;
             }
             case SPROTO_TSTRING:{
@@ -1456,11 +1468,11 @@ var Sproto = (function(){
         }
 
         sp.pack = function(inbuf){
-            return Sproto.pack(inbuf);
+            return t.pack(inbuf);
         }
 
         sp.unpack = function(inbuf){
-            return Sproto.unpack(inbuf);
+            return t.unpack(inbuf);
         }
 
         sp.pencode = function(type, inbuf){
@@ -1468,14 +1480,14 @@ var Sproto = (function(){
             if (obuf == null) {
                 return null;
             }
-            return Sproto.pack(obuf);
+            return sp.pack(obuf);
         }
         sp.pdecode = function(bype, inbuf){
             var obuf = sp.unpack(inbuf);
             if (obuf == null) {
                 return null;
             }
-            return Sproto.decode(type, obuf);
+            return sp.decode(type, obuf);
         }
 
         sp.host = function(){

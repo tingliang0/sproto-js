@@ -1,0 +1,99 @@
+.auth {
+	.PlayerBase {
+		player_id 0 : integer
+		nickname 1 : string
+		head_id 2 : integer
+		head_url 3 : string
+		sex 4 : integer #0-未知 1-男 2-女
+		gold 5 : integer #金币
+		max_own_gold 6 : integer #最大拥有的金币
+		max_win_gold 7 : integer #最大赢的金币
+		self_note 8 : string #介绍
+		last_login_time 9 : integer #最后登录时间
+		create_time 10 : integer
+	}
+
+	.RegisterReq {
+		account 0 : string #帐号
+		password 1 : string #密码
+		telephone 2 : string #电话号码
+		agent_id 3 : string #代理id(推荐人id)
+		create_index 4 : integer #创建索引
+		nickname 5 : string #昵称
+		signcode 6 : string #短信验证码
+	}
+
+	.RegisterReply {
+		player 0 : PlayerBase
+	}
+
+	.LoginReq {
+		account 0 : string #帐号
+		password 1 : string #密码
+	}
+
+	.LoginReply {
+		player 0 : PlayerBase
+	}
+
+	.WeiXinReq {
+		appid 0 : string
+		secret 1 : string
+		code 2 : string
+	}
+
+	.WeiXinReply {
+		player 0 : PlayerBase
+	}
+
+	.VisitorReq {
+		visit_token   0 : string  #游客token
+	}
+
+	.VisitorReply {
+		player 0 : PlayerBase
+		visit_token 1 : string #游客登录token
+	}
+
+	#获取微信签名
+	.WxSignInfoReq {
+		url 0 : string
+	}
+
+	.WxSignInfoReply{
+		appid 0 : string
+		noncestr 1 : string
+		timestamp 2 : integer
+		url 3 : string
+		signature 4 : string
+		rawstring 5 : string
+	}
+
+	#后台登录
+	.BackendLoginReq {
+		
+	}
+
+	.BackendLoginReply {
+
+	}
+
+	#短信验证码
+	.ShortMessageReq {
+		telephone 0 : string #手机号
+	}
+
+	.ShortMessageReply {
+		expire_time 0 : integer #验证码过期时间
+		retry_time 1 : integer #重试时间
+	}
+
+	.CheckMessageReq {
+		telephone 0 : string  #手机号
+		signcode 1 : string  #验证码
+	}
+
+	.CheckMessageReply {
+		
+	}
+}
