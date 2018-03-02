@@ -1484,7 +1484,7 @@ var Sproto = (function(){
             }
             return sp.pack(obuf);
         }
-        sp.pdecode = function(bype, inbuf){
+        sp.pdecode = function(type, inbuf){
             var obuf = sp.unpack(inbuf);
             if (obuf == null) {
                 return null;
