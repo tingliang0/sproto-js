@@ -403,7 +403,7 @@ var Sproto = (function(){
 
     // 二分查找
     function query_proto(sp, tag){
-        var begin;
+        var begin = 0;
         var end = sp.protocol_n;
         while(begin < end){
             var mid = Math.floor((begin+end) / 2);
