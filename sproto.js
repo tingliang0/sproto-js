@@ -47,6 +47,7 @@ var Sproto = (function(){
         return value;
     }
 
+    //64位整数位移操作会将64位截成32位有符号整数
     function uint64_lshift(num, offset){
         return num * Math.pow(2, offset);
     }
@@ -1173,9 +1174,11 @@ var Sproto = (function(){
                 } else {
                     v = target;
                 }
-                vh = uint64_rshift(v, 31);
+                vh = uint64_rshift(v, 31); //右移31位
+                // vh = v;
+                console.log("v="+ v +" vh="+vh);
                 if (vh == 0 || vh == -1){
-                    args.value = v & 0xFFFFFFFF;
+                    args.value = v >>> 0;
                     return 4;
                 } else {
                     args.value = v;
@@ -1252,10 +1255,13 @@ var Sproto = (function(){
                 if (value < 0) {
                     var sz;
                     if (size < SIZEOF_LENGTH) {
+                        console.log("111");
                         return -1;
                     }
                     sz = todword(datastream);
+                    console.log("sz="+sz+" size="+size+" SIZEOF_LENGTH="+SIZEOF_LENGTH);
                     if (size < sz + SIZEOF_LENGTH) {
+                        console.log("222");
                         return -1;
                     }
                     datastream = datastream.slice(sz + SIZEOF_LENGTH);
@@ -1280,6 +1286,7 @@ var Sproto = (function(){
                 if (value < 0){
                     if ((f.type & SPROTO_TARRAY) != 0){
                         if (decode_array(cb, args, currentdata)){
+                            console.log("333");
                             return -1;
                         }
                     } else {
@@ -1287,13 +1294,16 @@ var Sproto = (function(){
                         case SPROTO_TINTEGER:{
                             var sz = todword(currentdata);
                             if (sz == 4){
+                                console.log("444");
                                 var v = expand64(todword(currentdata.slice(SIZEOF_LENGTH)));
                                 args.value = v;
                                 args.length = 8;
                                 cb(args);
                             } else if(sz != 8){
+                                console.log("5555");
                                 return -1;
                             } else {
+                                console.log("666");
                                 var low = todword(currentdata.slice(SIZEOF_LENGTH));
                                 var hi = todword(currentdata.slice(SIZEOF_LENGTH + 4));
                                 var v = hi_low_uint64(low, hi);
@@ -1309,11 +1319,13 @@ var Sproto = (function(){
                             args.value = currentdata.slice(SIZEOF_LENGTH);
                             args.length = sz;
                             if (cb(args) != 0){
+                                console.log("777");
                                 return -1;
                             }
                             break;
                         }
                         default:
+                            console.log("888");
                             return -1;
                         }
                     }
@@ -1360,6 +1372,8 @@ var Sproto = (function(){
                     value = true;
                 } else if(args.value == 0){
                     value = false;
+                } else {
+                    value = null;
                 }
                 break;
             }
@@ -1462,7 +1476,7 @@ var Sproto = (function(){
             ud.result = new Object();
             var r = sproto_decode(st, buffer, sz, decode, ud);
             if (r < 0){
-                alert("decode error");
+                // alert("decode error");
                 return null;
             }
 
