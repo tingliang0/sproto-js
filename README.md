@@ -1,9 +1,25 @@
 # sprotojs
+[cloudwu's sproto](https://github.com/cloudwu/sproto) js 版本实现.
 
-#支持integer(2)这种小数类型  
-#支持binary类型  
-#支持52位无符号整数  
-#支持map类型  
+#### 功能
+---
+- [x] 普通字符串 string
+- [x] 二进制字符串binary
+- [x] 最大52位整数integer
+- [x] 符点数integer(n)
+- [x] 布尔类型 boolean
+- [x] 数组类型 *integer, *boolean, *string, *struct
+- [x] 带索引的数组类型 *struct(key)
+- [x] host 函数 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
+- [x] attach 函数 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
+- [x] dispatch 函数  (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
+- [x] 代码可读性, 格式化修改 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
+- [x] 示例 **(node test.js)** (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
+- [x] typescript 支持 **(import * as sproto from "./sproto")**  (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
+- [x] sproto_dump 实现, sproto 对象增加 dump 方法 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
 
-#生成spb的工具可以在 [sprototool](https://github.com/zhangshiqian1214/sprototool.git "Title") 的example里面找到  
+
+#### spb 文件生成工具
+[sprototool](https://github.com/zhangshiqian1214/sprototool.git)  
+ 
 
