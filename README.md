@@ -21,6 +21,8 @@
 
 
 #### spb 文件生成工具
-[sprototool](https://github.com/zhangshiqian1214/sprototool.git)  
+[sprototool](https://github.com/zhangshiqian1214/sprototool.git) 
+
+[spbtool](https://github.com/zhangshiqian1214/spbtool.git)
  
 
