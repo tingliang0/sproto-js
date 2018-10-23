@@ -1157,6 +1157,7 @@ var sproto = (function() {
                 if (args.tagname != self.array_tag) {
                     self.array_tag = args.tagname;
 
+                    var tagType = typeof(self.indata[args.tagname]);
                     if (typeof(self.indata[args.tagname]) != "object") {
                         self.array_index = 0;
                         return SPROTO_CB_NIL;
