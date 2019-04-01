@@ -1206,13 +1206,18 @@ var sproto = (function() {
                     }
                 case SPROTO_TSTRING:
                     {
-                        var str = target;
-                        var arr = utils.string2utf8(str);
+                        var arr;
+                        if (args.extra){ //传数组进来
+                            arr = target;
+                        } else {
+                            var str = target;
+                            arr = utils.string2utf8(str);
+                        }
+
                         var sz = arr.length;
                         if (sz > args.length) {
                             args.length = sz;
                         }
-
                         for (var i = 0; i < arr.length; i++) {
                             args.buffer[args.buffer_idx + i] = arr[i];
                         }
@@ -1390,7 +1395,12 @@ var sproto = (function() {
                         for (var i = 0; i < args.length; i++) {
                             arr.push(args.value[i]);
                         }
-                        value = utils.utf82string(arr);
+                        if (args.extra){
+                            value = arr;
+                        } else {
+                            value = utils.utf82string(arr);
+                        }
+                        
                         break;
                     }
                 case SPROTO_TSTRUCT:
