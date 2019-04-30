@@ -1491,7 +1491,7 @@ var sproto = (function() {
                 if (typeof(pname) === "number") {
                     var tmp = tag;
                     tag = pname;
-                    pname = tag;
+                    pname = tmp;
                 }
 
                 v = {
