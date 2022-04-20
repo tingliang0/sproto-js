@@ -613,23 +613,23 @@ var sproto = (function() {
                     for (var i = index - 2; i >= 0; i--) {
                         var negative;
                         for (var j = (1 + i * 8); j < (1 + i * 8 + 4); j++) {
-                            header[j] = header[j - i * 4];
+                            buffer[header_idx + j] = buffer[header_idx + j - i * 4];
                         }
-                        negative = header[1 + i * 8 + 3] & 0x80;
+                        negative = buffer[header_idx + 1 + i * 8 + 3] & 0x80;
                         uint32_to_uint64(negative, buffer, buffer_idx + 1 + i * 8);
                     }
                     intlen = 8;
                 }
 
-                v = value;
+                v = args.value;
                 buffer[buffer_idx] = v & 0xff;
-                buffer[buffer_idx + 1] = (v >> 8) & 0xff;
-                buffer[buffer_idx + 2] = (v >> 16) & 0xff;
-                buffer[buffer_idx + 3] = (v >> 24) & 0xff;
-                buffer[buffer_idx + 4] = (v >> 32) & 0xff;
-                buffer[buffer_idx + 5] = (v >> 40) & 0xff;
-                buffer[buffer_idx + 6] = (v >> 48) & 0xff;
-                buffer[buffer_idx + 7] = (v >> 56) & 0xff;
+                buffer[buffer_idx + 1] = uint64_rshift(v, 8) & 0xff;
+                buffer[buffer_idx + 2] = uint64_rshift(v, 16) & 0xff;
+                buffer[buffer_idx + 3] = uint64_rshift(v, 24) & 0xff;
+                buffer[buffer_idx + 4] = uint64_rshift(v, 32) & 0xff;
+                buffer[buffer_idx + 5] = uint64_rshift(v, 40) & 0xff;
+                buffer[buffer_idx + 6] = uint64_rshift(v, 48) & 0xff;
+                buffer[buffer_idx + 7] = uint64_rshift(v, 56) & 0xff;
             }
 
             buffer_idx += intlen;

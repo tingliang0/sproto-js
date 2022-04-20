@@ -21,7 +21,7 @@ var player = {
 	"isvip"    : true,
 	"gold"     : 2147483647,
     "signs"     : [false, false, true, false, true],
-    "pets"      : [10038, 10039, 10040, 10041, 10042],
+    "pets"      : [ 8589934592, 8589934592, 8589934592, 8589934592, 8589934592],
     "mails"     : ["hello", "world", "how", "are", "you"],
     "master"      : { "playerid" : 12345, "nickname" : "李飞haha"},
     "friends"    : [
