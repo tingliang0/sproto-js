@@ -1,24 +1,49 @@
-# sprotojs
-[云风的 c语言版 sproto](https://github.com/cloudwu/sproto)  
-[KAndQ js版sproto](https://github.com/KAndQ/sproto-js.git)
+sprotojs
+=======
+use sproto in javascript, you can find example in test.js
 
-#### 功能
----
-- [x] 普通字符串 string
-- [x] 二进制字符串binary
-- [x] 最大52位整数integer
-- [x] 符点数integer(n)
-- [x] 布尔类型 boolean
-- [x] 数组类型 *integer, *boolean, *string, *struct
-- [x] 带索引的数组类型 *struct(key)
-- [x] host 函数 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
-- [x] attach 函数 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
-- [x] dispatch 函数  (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
-- [x] 代码可读性, 格式化修改 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
-- [x] 示例 **(node test.js)** (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
-- [x] typescript 支持 **(import * as sproto from "./sproto")**  (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
-- [x] sproto_dump 实现, sproto 对象增加 dump 方法 (add by [KAndQ](https://github.com/KAndQ/sproto-js.git))
 
+Support Types
+=======
+
+* **string** : string
+* **binary** : binary string (it's a sub type of string)
+* **integer** : integer, the max length of an integer is signed 64bit. It can be a fixed-point number with specified precision.
+* **double** : double precision floating-point number, satisfy [the IEEE 754 standard](https://en.wikipedia.org/wiki/Double-precision_floating-point_format).
+* **boolean** : true or false
+
+
+```
+# This is a comment.
+
+.Person {	# . means a user defined type 
+    name 0 : string	# string is a build-in type.
+    id 1 : integer
+    email 2 : string
+
+    .PhoneNumber {	# user defined type can be nest.
+        number 0 : string
+        type 1 : integer
+    }
+
+    phone 3 : *PhoneNumber	# *PhoneNumber means an array of PhoneNumber.
+    height 4 : integer(2)	# (2) means a 1/100 fixed-point number.
+    data 5 : binary		# Some binary data
+    weight 6 : double   # floating number
+}
+
+.AddressBook {
+    person 0 : *Person(id)	# (id) is optional, means Person.id is main index.
+}
+
+foobar 1 {	# define a new protocol (for RPC used) with tag 1
+    request Person	# Associate the type Person with foobar.request
+    response {	# define the foobar.response type
+        ok 0 : boolean
+    }
+}
+
+```
 
 #### spb 文件生成工具
 [sprototool](https://github.com/zhangshiqian1214/sprototool.git) 
