@@ -15,7 +15,8 @@ var sproto = (function() {
     var SPROTO_TINTEGER = 0;
     var SPROTO_TBOOLEAN = 1;
     var SPROTO_TSTRING = 2;
-    var SPROTO_TSTRUCT = 3;
+    var SPROTO_TDOUBLE = 3;
+    var SPROTO_TSTRUCT = 4;
 
     // sub type of string (sproto_arg.extra)
     var SPROTO_TSTRING_STRING = 0;
@@ -534,6 +535,102 @@ var sproto = (function() {
         data[data_idx + 10] = uint64_rshift(v, 48) & 0xff;
         data[data_idx + 11] = uint64_rshift(v, 56) & 0xff;
         return fill_size(data, data_idx, 8);
+    }
+
+    function dec_to_bin_tail(dec, pad){
+        var bin = "";
+        var i;
+        for (i = 0; i < pad; i++)
+        {
+            dec *= 2;
+            if (dec>= 1)
+            {
+                dec -= 1;
+                bin += "1";
+            }
+            else
+            {
+                bin += "0";
+            }
+        }
+        return bin;
+    }
+    
+    function dec_to_bin_head(data, len){
+        var result = "";
+        for (var i=len-1; i>=0; i--){
+            var mask = 1 << i;
+            if ((mask & data) == 0){
+                result += "0";
+            } else {
+                result += "1";
+            }
+        }
+        return result; 
+    }
+    
+    function get_double_hex(decString){
+        var sign;
+        var signString;
+        var exponent;
+        var decValue = parseFloat(Math.abs(decString));
+        if (decString.toString().charAt(0) == '-'){
+            sign = 1;
+            signString = "1";
+        } else {
+            sign = 0;
+            signString = "0";
+        }
+        if (decValue == 0){
+            exponent = 0;
+        } else {
+            exponent = 1023;
+            if (decValue >= 2){
+                while(decValue >= 2){
+                    exponent++;
+                    decValue /= 2;
+                }
+            } else if (decValue < 1){
+                while (decValue<1){
+                    exponent--;
+                    decValue *= 2;
+                    if (exponent == 0){
+                        break;
+                    }
+                }
+            }
+            if (exponent != 0) decValue -= 1; else decValue /= 2;
+            var fractionString = dec_to_bin_tail(decValue, 52);
+            var exponentString = dec_to_bin_head(exponent, 11);
+            var doubleBinStr = signString + exponentString + fractionString;
+            var doubleHexStr = "";
+            for (let i=0,j=0; i<8;i++,j+=8){
+                let m = 3 - (j%4);
+                let hexUnit = doubleBinStr[j] * Math.pow(2, m) + doubleBinStr[j+1] * Math.pow(2, m-1) + doubleBinStr[j+2]*Math.pow(2, m-2) + doubleBinStr[j+3]*Math.pow(2, m-3);
+                let hexDecade = doubleBinStr[j+4]*Math.pow(2,m) + doubleBinStr[j+5]*Math.pow(2,m-1) + doubleBinStr[j+6]*Math.pow(2,m-2) + doubleBinStr[j+7]*Math.pow(2,m-3);
+                doubleHexStr = doubleHexStr + hexUnit.toString(16) + hexDecade.toString(16);
+            }
+            return doubleHexStr;
+        }
+    }
+    
+    function double_to_binary(v, data, data_idx)
+    {
+        var str = Number(v).toString();
+        var hexStr = get_double_hex(str);
+        for(let i=0,j=0;i<8;i++,j+=2)
+        {
+            let dec = parseInt(hexStr[j],16)*16 + parseInt(hexStr[j+1],16);
+            data[data_idx+i+4] = dec;
+        }
+        return fill_size(data, data_idx, 8);
+    }
+    
+    function binary_to_double(data) {
+        let buf = new Uint8Array(data);
+        buf.reverse();
+        let buf64 = new Float64Array(buf.buffer);
+        return buf64[0];
     }
 
     function encode_object(cb, args, data, data_idx) {
@@ -1064,6 +1161,7 @@ var sproto = (function() {
                     args.type = type;
                     args.index = 0;
                     switch (type) {
+                        case SPROTO_TDOUBLE:
                         case SPROTO_TINTEGER:
                         case SPROTO_TBOOLEAN:
                             args.value = 0;
@@ -1086,7 +1184,11 @@ var sproto = (function() {
                                     sz = encode_integer(args.value, buffer, data_idx, sz);
                                 }
                             } else if (sz == 8) {
-                                sz = encode_uint64(args.value, buffer, data_idx, sz);
+                                if (type == SPROTO_TDOUBLE){
+                                    sz = double_to_binary(args.value, buffer, data_idx, sz)
+                                } else {
+                                    sz = encode_uint64(args.value, buffer, data_idx, sz);
+                                }
                             } else {
                                 return -1;
                             }
@@ -1194,6 +1296,11 @@ var sproto = (function() {
                             args.value = v;
                             return 8;
                         }
+                    }
+                case SPROTO_TDOUBLE:
+                    {
+                        args.value = target;
+                        return 8;
                     }
                 case SPROTO_TBOOLEAN:
                     {
@@ -1303,6 +1410,13 @@ var sproto = (function() {
                         }
                     } else {
                         switch (f.type) {
+                            case SPROTO_TDOUBLE:
+                                {
+                                    args.value = binary_to_double(currentdata.slice(SIZEOF_LENGTH));
+                                    args.length = 8;
+                                    cb(args);
+                                    break;
+                                }
                             case SPROTO_TINTEGER:
                                 {
                                     var sz = todword(currentdata);
@@ -1377,6 +1491,11 @@ var sproto = (function() {
                             value = args.value;
                         }
                         break;
+                    }
+                case SPROTO_TDOUBLE:
+                    {
+                        value = args.value;
+                        break
                     }
                 case SPROTO_TBOOLEAN:
                     {
