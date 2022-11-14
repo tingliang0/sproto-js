@@ -1122,8 +1122,8 @@ var sproto = (function() {
         s.protocol_n = 0;
         s.type = null;
         s.proto = null;
-        s.tcache = {};
-        s.pcache = {};
+            s.tcache = new Map();
+            s.pcache = new Map();
         var sp = create_from_bundle(s, binsch, binsch.length);
         if (sp == null) return null;
 
@@ -1565,72 +1565,62 @@ var sproto = (function() {
         }
 
         function querytype(sp, typename) {
-            var v = sp.tcache[typename];
-            if (v === null || v === undefined) {
-                v = sproto_type(sp, typename);
-                sp.tcache[typename] = v;
-            }
-            return v;
+                if (sp.tcache.has(typename)){
+                    return sp.tcache.get(typename);
+                }
+                var typeinfo = sproto_type(sp, typename);
+                if (typeinfo){
+                    sp.tcache.set(typename, typeinfo);
+                    return typeinfo;
+                }
+                return null;
         }
 
         function protocol(sp, pname) {
-            var tag = null;
-            var ret1 = null;
+                var tag = null;
+                var name = null;
 
-            if (typeof(pname) == "number") {
-                tag = pname;
-                ret1 = sproto_protoname(sp, pname);
-                if (ret1 === null)
-                    return null;
-            } else {
-                tag = sproto_prototag(sp, pname);
-                ret1 = tag;
+                if (typeof(pname) == "number") {
+                    tag = pname;
+                    name = sproto_protoname(sp, pname);
+                    if (!name)
+                        return null;
+                } else {
+                    tag = sproto_prototag(sp, pname);
+                    name = pname;
 
-                if (tag === -1)
-                    return null;
-            }
+                    if (tag === -1) return null;
+                }
 
-            var request = sproto_protoquery(sp, tag, SPROTO_REQUEST);
-            var response = sproto_protoquery(sp, tag, SPROTO_RESPONSE);
-            return {
-                ret1: ret1,
-                request: request,
-                response: response
-            };
+                var request = sproto_protoquery(sp, tag, SPROTO_REQUEST);
+                var response = sproto_protoquery(sp, tag, SPROTO_RESPONSE);
+                return {
+                    tag: tag,
+                    name: name,
+                    request: request,
+                    response: response
+                };
         }
 
         function queryproto(sp, pname) {
-            var v = sp.pcache[pname];
-            if (v === null || v === undefined) {
-                var ret = protocol(sp, pname);
-                var tag = ret.ret1;
-                var req = ret.request;
-                var resp = ret.response;
-
-                if (typeof(pname) === "number") {
-                    var tmp = tag;
-                    tag = pname;
-                    pname = tmp;
+                if (sp.pcache.has(pname)){
+                    return sp.pcache.get(pname);
                 }
-
-                v = {
-                    request: req,
-                    response: resp,
-                    name: pname,
-                    tag: tag,
-                };
-
-                sp.pcache[pname] = v;
-                sp.pcache[tag] = v;
+                var protoinfo = protocol(sp, pname);
+                if (protoinfo){
+                    sp.pcache.set(protoinfo.name, protoinfo);
+                    sp.pcache.set(protoinfo.tag, protoinfo);
+                    return protoinfo;
+                }
+                return null;
             }
-            return v;
-        }
 
-        sp.dump = function() {
-            console.log("========== sproto dump ==========");
-            sproto_dump(this);
-            console.log("=================================");
-        }
+            sp.queryproto = function(protocolName){
+                return queryproto(sp, protocolName);
+            };
+            sp.dump = function() {
+                sproto_dump(this);
+            }
 
         sp.objlen = function(type, inbuf) {
             var st = null;
