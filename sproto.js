@@ -1412,9 +1412,15 @@ var sproto = (function() {
                         switch (f.type) {
                             case SPROTO_TDOUBLE:
                                 {
-                                    args.value = binary_to_double(currentdata.slice(SIZEOF_LENGTH));
-                                    args.length = 8;
-                                    cb(args);
+                                    var sz = todword(currentdata);
+                                    if (sz == 8){
+                                        let doubleBin = currentdata.slice(SIZEOF_LENGTH, SIZEOF_LENGTH+8);
+                                        args.value = binary_to_double(doubleBin);
+                                        args.length = 8;
+                                        cb(args);
+                                    } else {
+                                        return -1;
+                                    }
                                     break;
                                 }
                             case SPROTO_TINTEGER:
@@ -1425,16 +1431,16 @@ var sproto = (function() {
                                         args.value = v;
                                         args.length = 8;
                                         cb(args);
-                                    } else if (sz != 8) {
-                                        return -1;
-                                    } else {
+                                    } else if(sz == 8) {
                                         var low = todword(currentdata.slice(SIZEOF_LENGTH));
                                         var hi = todword(currentdata.slice(SIZEOF_LENGTH + 4));
                                         var v = hi_low_uint64(low, hi);
                                         args.value = v;
                                         args.length = 8;
                                         cb(args);
-                                    }
+                                    } else {
+                                        return -1;
+                                    } 
                                     break;
                                 }
                             case SPROTO_TSTRING:
