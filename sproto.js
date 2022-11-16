@@ -618,9 +618,15 @@ var sproto = (function() {
     {
         var str = Number(v).toString();
         var hexStr = get_double_hex(str);
+        var arr = [];
         for(let i=0,j=0;i<8;i++,j+=2)
         {
             let dec = parseInt(hexStr[j],16)*16 + parseInt(hexStr[j+1],16);
+            arr.push(dec);
+        }
+        arr.reverse();
+        for (let i=0; i<8; i++){
+            let dec = arr[i];
             data[data_idx+i+4] = dec;
         }
         return fill_size(data, data_idx, 8);
@@ -628,7 +634,7 @@ var sproto = (function() {
     
     function binary_to_double(data) {
         let buf = new Uint8Array(data);
-        buf.reverse();
+        // buf.reverse();
         let buf64 = new Float64Array(buf.buffer);
         return buf64[0];
     }
