@@ -1,0 +1,30 @@
+.package {
+	type  		0 : integer
+	session 	1 : integer
+}
+
+
+
+	heartbeat 1 {
+		request {}
+		response {
+			ok 	1 : boolean # true
+			time 	2 : integer # 服务器时间
+		}
+	}
+	
+
+	#测试double字段
+	test_double_msg 125 {
+		request {
+			test1 0 : double
+			test2 1 : integer 
+			test3 3 : string 
+		}
+		response {
+			test1 0 : double
+			test2 1 : integer 
+			test3 3 : string 
+		}
+	}
+
