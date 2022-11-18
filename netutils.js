@@ -1,4 +1,4 @@
-var utils = (function() {
+var netutils = (function() {
     var t = {};
 
     t.array2arraybuffer = function(array) {
@@ -93,4 +93,5 @@ var utils = (function() {
     return t;
 }());
 
-module.exports = utils;
+// export default netutils;
+module.exports = netutils;

@@ -1,6 +1,6 @@
 // sproto.js 解析
-
-var utils = require('./utils');
+// import netutils from "netutils"
+var netutils = require("./netutils");
 
 var sproto = (function() {
     var t = {};
@@ -1324,7 +1324,7 @@ var sproto = (function() {
                             arr = target;
                         } else {
                             var str = target;
-                            arr = utils.string2utf8(str);
+                            arr = netutils.string2utf8(str);
                         }
 
                         var sz = arr.length;
@@ -1529,7 +1529,7 @@ var sproto = (function() {
                         if (args.extra){
                             value = arr;
                         } else {
-                            value = utils.utf82string(arr);
+                            value = netutils.utf82string(arr);
                         }
                         
                         break;
@@ -1762,7 +1762,7 @@ var sproto = (function() {
 
                 if (args) {
                     var databuffer = sp.encode(proto.request, args);
-                    return sp.pack(utils.arrayconcat(headerbuffer, databuffer));
+                    return sp.pack(netutils.arrayconcat(headerbuffer, databuffer));
                 } else {
                     return sp.pack(headerbuffer);
                 }
@@ -1776,7 +1776,7 @@ var sproto = (function() {
                 var headerbuffer = self.proto.encode(self.package, header_tmp);
                 if (response) {
                     var databuffer = self.proto.encode(response, args);
-                    return self.proto.pack(utils.arrayconcat(headerbuffer, databuffer));
+                    return self.proto.pack(netutils.arrayconcat(headerbuffer, databuffer));
                 } else {
                     return self.proto.pack(headerbuffer);
                 }
@@ -1843,4 +1843,5 @@ var sproto = (function() {
     return t;
 }());
 
+// export default sproto;
 module.exports = sproto;

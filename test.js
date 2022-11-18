@@ -1,6 +1,6 @@
 var fs = require("fs");
 var sproto = require("./sproto");
-var utils = require("./utils");
+// var netutils = require("./netutils");
 
 var filename = "./sproto.spb";
 var buffer = fs.readFileSync(filename);
