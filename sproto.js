@@ -813,9 +813,9 @@ var sproto = (function() {
         }
 
         sz = buffer_idx - (data_idx + SIZEOF_LENGTH);
-        if (sz == 0) {
-            return 0;
-        }
+        // if (sz == 0) {
+        //     return 0;
+        // }
 
         return fill_size(buffer, data_idx, sz);
     }
@@ -1271,7 +1271,7 @@ var sproto = (function() {
                         return SPROTO_CB_NIL;
                     }
 
-                    if (self.indata[args.tagname].length == 0 || self.indata[args.tagname].length == null) {
+                    if (self.indata[args.tagname] == null || self.indata[args.tagname] == undefined) {
                         self.array_index = 0;
                         return SPROTO_CB_NOARRAY;
                     }
