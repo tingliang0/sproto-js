@@ -1749,11 +1749,14 @@ var sproto = (function() {
         host.attach = function(sp) {
             this.attachsp = sp;
             var self = this;
-            return (name, args, session) => {
+            return (name, args, session, ud) => {
                 var proto = queryproto(sp, name);
 
                 header_tmp.type = proto.tag;
                 header_tmp.session = session;
+                if (ud) {
+                    header_tmp.ud = ud;
+                }
 
                 var headerbuffer = sp.encode(self.package, header_tmp);
                 if (session) {
